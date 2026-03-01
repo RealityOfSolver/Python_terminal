@@ -3,7 +3,7 @@ import asyncio
 import time
 
 async def main():
-    EX = 10
+    EX = 5
     
     print("--- Starting Loop ---")
     
