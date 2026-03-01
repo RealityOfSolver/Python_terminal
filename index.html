@@ -29,7 +29,8 @@
             try {
                 // 2. Fetch your Python file from the same repo
                 // Replace 'script.py' with your actual filename
-                const response = await fetch('script.py');
+                // Change this line in your main() function:
+                const response = await fetch('script.py?nocache=' + Math.random());
                 const pythonCode = await response.text();
 
                 status.innerText = "Running script.py...";
