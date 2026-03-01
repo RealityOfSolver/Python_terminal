@@ -40,7 +40,7 @@
                 }});
 
                 // 4. Run the code
-                await pyodide.runPythonAsync(pythonCode);
+                pyodide.runPython(pythonCode);
                 status.innerText = "Execution complete.";
 
             } catch (err) {
