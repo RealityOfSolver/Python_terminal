@@ -22,33 +22,27 @@
         const status = document.getElementById('status');
 
         async function main() {
-            // 1. Load Pyodide
             let pyodide = await loadPyodide();
-            status.innerText = "Python Ready. Fetching script...";
-
-            try {
-                // 2. Fetch your Python file from the same repo
-                // Replace 'script.py' with your actual filename
-                // Change this line in your main() function:
-                const response = await fetch('script.py?nocache=' + (Math.random() * Math.random());
-                const pythonCode = await response.text();
-
-                status.innerText = "Running script.py...";
-
-                // 3. Redirect Python's STDOUT to our terminal div
-                pyodide.setStdout({ batched: (str) => {
-                    terminal.innerText += str + "\n";
-                }});
-
-                // 4. Run the code
-                pyodide.runPython(pythonCode);
-                status.innerText = "Execution complete.";
-
-            } catch (err) {
-                terminal.innerText += "\n[ERROR]: " + err;
-                status.innerText = "Execution failed.";
-            }
+            
+            // --- ADD THESE TWO LINES ---
+            status.innerText = "Loading NumPy (this may take a moment)...";
+            await pyodide.loadPackage("numpy"); 
+            // ---------------------------
+        
+            status.innerText = "Fetching Donut Script...";
+            const response = await fetch('script.py?v=' + Math.random());
+            const pythonCode = await response.text();
+        
+            pyodide.setStdout({ batched: (str) => {
+                // For the donut, we want to replace the text, not just append it
+                // so it looks like an animation instead of a long list
+                terminal.innerText = str; 
+            }});
+        
+            status.innerText = "Running...";
+            await pyodide.runPythonAsync(pythonCode);
         }
+
 
         main();
     </script>
