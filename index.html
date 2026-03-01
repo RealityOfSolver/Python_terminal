@@ -1,50 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Python Terminal</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
     <style>
-        body { background-color: #1a1a1a; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
-        #terminal { background: #000; border: 1px solid #444; padding: 15px; min-height: 300px; white-space: pre-wrap; }
-        .status { color: #888; margin-bottom: 10px; }
+        body { background: #000; color: #0f0; font-family: monospace; overflow: hidden; }
+        #terminal { 
+            white-space: pre; 
+            font-size: 1.2vw; /* Scales size for iPad screen */
+            line-height: 1;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-
-    <h2>Python Output</h2>
-    <div id="status" class="status">Initializing Python environment...</div>
+    <div id="status">Loading NumPy...</div>
     <div id="terminal"></div>
 
     <script>
-        const terminal = document.getElementById('terminal');
-        const status = document.getElementById('status');
-
-        async function main() {
+        async function run() {
             let pyodide = await loadPyodide();
+            // Load NumPy before running script
+            await pyodide.loadPackage("numpy");
             
-            // --- ADD THESE TWO LINES ---
-            status.innerText = "Loading NumPy (this may take a moment)...";
-            await pyodide.loadPackage("numpy"); 
-            // ---------------------------
-        
-            status.innerText = "Fetching Donut Script...";
+            const status = document.getElementById('status');
+            const terminal = document.getElementById('terminal');
+            
+            // Cache buster for iPad
             const response = await fetch('script.py?v=' + Math.random());
-            const pythonCode = await response.text();
-        
+            const code = await response.text();
+            
             pyodide.setStdout({ batched: (str) => {
-                // For the donut, we want to replace the text, not just append it
-                // so it looks like an animation instead of a long list
-                terminal.innerText = str; 
+                terminal.innerText = str; // Overwrites instead of appends
             }});
-        
-            status.innerText = "Running...";
-            await pyodide.runPythonAsync(pythonCode);
+            
+            status.style.display = 'none';
+            pyodide.runPython(code);
         }
-
-
-        main();
+        run();
     </script>
 </body>
 </html>
