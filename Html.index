@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Python Terminal</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <style>
+        body { background-color: #1a1a1a; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
+        #terminal { background: #000; border: 1px solid #444; padding: 15px; min-height: 300px; white-space: pre-wrap; }
+        .status { color: #888; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Python Output</h2>
+    <div id="status" class="status">Initializing Python environment...</div>
+    <div id="terminal"></div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const status = document.getElementById('status');
+
+        async function main() {
+            // 1. Load Pyodide
+            let pyodide = await loadPyodide();
+            status.innerText = "Python Ready. Fetching script...";
+
+            try {
+                // 2. Fetch your Python file from the same repo
+                // Replace 'script.py' with your actual filename
+                const response = await fetch('script.py');
+                const pythonCode = await response.text();
+
+                status.innerText = "Running script.py...";
+
+                // 3. Redirect Python's STDOUT to our terminal div
+                pyodide.setStdout({ batched: (str) => {
+                    terminal.innerText += str + "\n";
+                }});
+
+                // 4. Run the code
+                await pyodide.runPythonAsync(pythonCode);
+                status.innerText = "Execution complete.";
+
+            } catch (err) {
+                terminal.innerText += "\n[ERROR]: " + err;
+                status.innerText = "Execution failed.";
+            }
+        }
+
+        main();
+    </script>
+</body>
+</html>
